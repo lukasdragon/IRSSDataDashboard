@@ -2,6 +2,7 @@ import json
 
 import requests
 import streamlit as st
+import numpy as np
 
 from datetime import datetime
 
@@ -66,9 +67,9 @@ def make_request(path, *params):
 
 channels = make_request("channels")
 usernames = make_request("usernames")
-rolls = make_request("rolls", "select=unix_milliseconds,dice_value,user_id")
+rolls = make_request("rolls", "select=unix_milliseconds, dice_value"
+                              "channel:channels(name:channel_name),"
+                              "user:usernames(name:username)")
 
 for roll in rolls:
-    roll["time"] = unix_ms_to_datetime(roll["unix_milliseconds"])
-
-st.write(rolls)
+    roll["date_time"] = unix_ms_to_datetime(roll["unix_milliseconds"])
