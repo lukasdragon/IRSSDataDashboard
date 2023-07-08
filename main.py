@@ -19,6 +19,7 @@ st.write(
     "The lowest roller on each day has to make the coffee for the next morning. "
     "Data is scrapped in near-realtime through our JavaJotter bot.")
 
+
 def make_request(path, *params):
     url = f"{API_URL}{path}?{'&'.join(params)}"
     response = requests.get(url, headers=HEADERS)
@@ -27,21 +28,27 @@ def make_request(path, *params):
     else:
         st.error(f"Request failed with status code {response.status_code}: {response.text}")
 
+
 def get_date_of_previous_sunday(input_date, weeks_before=1):
     date_weeks_before = input_date - timedelta(weeks=weeks_before)
     days_to_subtract = (date_weeks_before.weekday() + 1) % 7
     return date_weeks_before - timedelta(days=days_to_subtract)
+
 
 def date_to_unix_ms(date):
     """Convert date to unix timestamp in ms"""
     dt = datetime(date.year, date.month, date.day)
     return int(dt.timestamp() * 1000)
 
+
+@st.cache_data
 def fetch_and_process_data(start_date, end_date):
     start_ums = date_to_unix_ms(start_date)
     end_ums = date_to_unix_ms(end_date)
     rolls = make_request("rolls",
-                         "select=unix_milliseconds,dice_value,channel:channels(name:channel_name),username:usernames(name:username)",
+                         "select=unix_milliseconds,dice_value,"
+                         "channel:channels(name:channel_name),"
+                         "username:usernames(name:username)",
                          f"unix_milliseconds=gte.{start_ums}",
                          f"unix_milliseconds=lte.{end_ums}")
 
@@ -65,11 +72,13 @@ def fetch_and_process_data(start_date, end_date):
         st.error('Error: Unable to retrieve data.')
         return None, None
 
+
 def plot(df, df_min):
     plot_pie(df_min)
     plot_line(df)
     plot_hist(df)
     plot_heatmap(df)
+
 
 def plot_pie(df):
     username_counts = df['username'].value_counts()
@@ -79,14 +88,17 @@ def plot_pie(df):
     plt.title('Distribution of coffee preparers over time period.')
     st.pyplot(fig)
 
+
 def plot_line(df):
     st.line_chart(df[['dice_value']])
+
 
 def plot_hist(df):
     fig, ax = plt.subplots()
     df['dice_value'].plot(kind='hist', rwidth=0.8, bins=6)
     plt.title('Dice roll frequencies')
     st.pyplot(fig)
+
 
 def plot_heatmap(df):
     df['weekday'] = df.index.weekday
@@ -97,6 +109,7 @@ def plot_heatmap(df):
     sns.heatmap(heatmap_data, cmap="YlGnBu")
     plt.title('Roll counts by day of week and user')
     st.pyplot(fig)
+
 
 start_date = get_date_of_previous_sunday(datetime.today(), 4)
 end_date = datetime.today()
