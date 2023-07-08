@@ -3,7 +3,16 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import footer
 from datetime import datetime, timedelta
+
+st.set_page_config(page_title="Java Jotter Dashboard", page_icon="☕", layout="centered",
+                   initial_sidebar_state="expanded", menu_items={
+                    'Get Help': 'https://github.com/lukasdragon/IRSSDataDashboard',
+                    'Report a bug': "https://github.com/lukasdragon/IRSSDataDashboard/issues",
+                    })
+
+footer.footer()
 
 API_URL = "https://hacvffgmaquyyeiusnbi.supabase.co/rest/v1/"
 API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm" \
@@ -12,12 +21,13 @@ API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm" \
           "HIO6RGgmEtBD7JaSvNEM5EX2C-EbVQH8ZmjHIExD53Q"
 HEADERS = {'apikey': API_KEY}
 
-st.title("Dice Rolls Analysis")
-st.write(
-    "This dashboard analyses dice roll data between the given dates. "
-    "In the IRSS, each member who drinks coffee must roll a dice. "
-    "The lowest roller on each day has to make the coffee for the next morning. "
-    "Data is scrapped in near-realtime through our JavaJotter bot.")
+with st.sidebar:
+    st.title("Java Jotter Dashboard")
+    st.write(
+        "This dashboard analyses dice roll data between the given dates. "
+        "In the IRSS, each member who drinks coffee must roll a dice. "
+        "The lowest roller on each day has to make the coffee for the next morning. "
+        "Data is scrapped in near-realtime through our JavaJotter bot.")
 
 
 def make_request(path, *params):
@@ -114,9 +124,10 @@ def plot_heatmap(df):
 start_date = get_date_of_previous_sunday(datetime.today(), 4)
 end_date = datetime.today()
 
-dates = st.date_input('Select start and end date:', [start_date, end_date])
-
-if st.button('Confirm Dates'):
+with st.sidebar:
+    dates = st.date_input('Select start and end date:', [start_date, end_date])
+    button = st.button('Confirm Dates')
+if button:
     if len(dates) < 2:  # If the user did not select a second date
         st.warning('Please select a second date.')
     elif dates[0] > dates[1]:
@@ -128,4 +139,4 @@ if st.button('Confirm Dates'):
         if df is not None:
             plot(df, df_min)
 
-st.write("[API Documentation](https://app.swaggerhub.com/apis/OLSON_1/JavaJotterAPI/10.2.0)")
+# footer("[API Documentation](https://app.swaggerhub.com/apis/OLSON_1/JavaJotterAPI/10.2.0)")
