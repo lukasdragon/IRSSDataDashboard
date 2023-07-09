@@ -3,16 +3,12 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import footer
+import layout
 from datetime import datetime, timedelta
 
-st.set_page_config(page_title="Java Jotter Dashboard", page_icon="☕", layout="centered",
-                   initial_sidebar_state="expanded", menu_items={
-                    'Get Help': 'https://github.com/lukasdragon/IRSSDataDashboard',
-                    'Report a bug': "https://github.com/lukasdragon/IRSSDataDashboard/issues",
-                    })
 
-footer.footer()
+
+layout.apply_layout()
 
 API_URL = "https://hacvffgmaquyyeiusnbi.supabase.co/rest/v1/"
 API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm" \
